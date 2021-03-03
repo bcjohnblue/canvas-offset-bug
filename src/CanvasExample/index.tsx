@@ -12,8 +12,6 @@ const Box: React.FC<MeshProps> = (props) => {
 
 	// Rotate mesh every frame, this is outside of React without overhead
 	useFrame(() => {
-		console.log('useFrame');
-
 		if (mesh.current) mesh.current.rotation.x = mesh.current.rotation.y += 0.01;
 	});
 
