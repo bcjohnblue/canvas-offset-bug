@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React, {useCallback, useRef, useState} from 'react';
 import {Canvas, MeshProps} from 'react-three-fiber';
 import {
 	continueRender,
@@ -21,16 +21,9 @@ const Box: React.FC<
 	const [hovered, setHover] = useState(false);
 	const [active, setActive] = useState(false);
 
-	const currentFrame = useRef(props.frame);
-	currentFrame.current = props.frame;
-
 	if (mesh.current) {
-		mesh.current.rotation.x = currentFrame.current * 0.02;
+		mesh.current.rotation.x = props.frame * 0.02;
 	}
-
-	useEffect(() => {
-		currentFrame.current = props.frame;
-	}, [props.frame]);
 
 	return (
 		<mesh
