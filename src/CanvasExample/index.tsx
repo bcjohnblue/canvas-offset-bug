@@ -1,8 +1,19 @@
-import React, {useRef, useState} from 'react';
-import {Canvas, MeshProps, useFrame} from 'react-three-fiber';
+import React, {useCallback, useRef, useState} from 'react';
+import {Canvas, MeshProps} from 'react-three-fiber';
+import {
+	continueRender,
+	delayRender,
+	useCurrentFrame,
+	useVideoConfig,
+} from 'remotion';
 import type {Mesh} from 'three';
+import '../index.css';
 
-const Box: React.FC<MeshProps> = (props) => {
+const Box: React.FC<
+	MeshProps & {
+		frame: number;
+	}
+> = (props) => {
 	// This reference will give us direct access to the mesh
 	const mesh = useRef<Mesh>();
 
@@ -10,10 +21,9 @@ const Box: React.FC<MeshProps> = (props) => {
 	const [hovered, setHover] = useState(false);
 	const [active, setActive] = useState(false);
 
-	// Rotate mesh every frame, this is outside of React without overhead
-	useFrame(() => {
-		if (mesh.current) mesh.current.rotation.x = mesh.current.rotation.y += 0.01;
-	});
+	if (mesh.current) {
+		mesh.current.rotation.x = props.frame * 0.02;
+	}
 
 	return (
 		<mesh
@@ -33,12 +43,23 @@ const Box: React.FC<MeshProps> = (props) => {
 type Props = Record<string, never>;
 
 export default (() => {
+	const [handle] = useState(() => delayRender());
+	const config = useVideoConfig();
+	const frame = useCurrentFrame();
+
+	const onLoad = useCallback(() => {
+		continueRender(handle);
+	}, []);
+
 	return (
-		<Canvas style={{width: '100%', height: '100%'}}>
+		<Canvas
+			style={{width: config.width, height: config.height}}
+			onCreated={onLoad}
+		>
 			<ambientLight />
 			<pointLight position={[10, 10, 10]} />
-			<Box position={[-1.2, 0, 0]} />
-			<Box position={[1.2, 0, 0]} />
+			<Box position={[-1.2, 0, 0]} frame={frame} />
+			<Box position={[1.2, 0, 0]} frame={frame} />
 		</Canvas>
 	);
 }) as React.FC<Props>;
